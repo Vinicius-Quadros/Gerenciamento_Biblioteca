@@ -4,7 +4,10 @@
 #include "livro.h"
 
 // Funcao para criar um novo livro
-Livro* criarLivro(int id, char* titulo, char* autor, int ano, char emprestimo) {
+// Funcao para criar um novo livro (atualizada)
+Livro* criarLivro(int id, char* titulo, char* autor, int ano, 
+                 char* editora, char* categoria, char* isbn, 
+                 int quantidade) {
     Livro* novoLivro = (Livro*)malloc(sizeof(Livro));
     if (novoLivro == NULL) {
         printf("Erro de alocacao de memoria!\n");
@@ -15,9 +18,12 @@ Livro* criarLivro(int id, char* titulo, char* autor, int ano, char emprestimo) {
     strcpy(novoLivro->titulo, titulo);
     strcpy(novoLivro->autor, autor);
     novoLivro->ano = ano;
-    novoLivro->emprestimo = emprestimo;
+    strcpy(novoLivro->editora, editora);
+    strcpy(novoLivro->categoria, categoria);
+    strcpy(novoLivro->isbn, isbn);
+    novoLivro->quantidade = quantidade;
     novoLivro->prox = NULL;
-    novoLivro->ant = NULL; // Inicializa ponteiro anterior como NULL
+    novoLivro->ant = NULL;
     
     return novoLivro;
 }
@@ -196,12 +202,13 @@ int comparaAno(Livro* a, Livro* b, int crescente) {
         return b->ano - a->ano;
 }
 
-int comparaEmprestimo(Livro* a, Livro* b, int emprestadosPrimeiro) {
-    if (emprestadosPrimeiro)
-        return (b->emprestimo == 's') - (a->emprestimo == 's');
+int comparaQuantidade(Livro* a, Livro* b, int crescente) {
+    if (crescente)
+        return a->quantidade - b->quantidade;
     else
-        return (a->emprestimo == 's') - (b->emprestimo == 's');
+        return b->quantidade - a->quantidade;
 }
+
 
 // Implementação das funções de ordenação
 Livro* ordenarPorId(Livro* lista, int crescente) {
@@ -220,6 +227,7 @@ Livro* ordenarPorAno(Livro* lista, int crescente) {
     return bubbleSort(lista, comparaAno, crescente);
 }
 
-Livro* ordenarPorEmprestimo(Livro* lista, int emprestadosPrimeiro) {
-    return bubbleSort(lista, comparaEmprestimo, emprestadosPrimeiro);
+Livro* ordenarPorQuantidade(Livro* lista, int crescente) {
+    return bubbleSort(lista, comparaQuantidade, crescente);
 }
+

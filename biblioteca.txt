@@ -1,17 +1,16 @@
-1,Romeu e Julieta,Homero,2025,n
-2,O Senhor dos Anéis,J.R.R. Tolkien,1954,n
-3,Dom Quixote,Miguel de Cervantes,1605,s
-4,Cem Anos de Solidão,Gabriel García Márquez,1967,n
-5,1984,George Orwell,1949,s
-6,O Pequeno Príncipe,Antoine de Saint-Exupéry,1943,n
-7,Orgulho e Preconceito,Jane Austen,1813,n
-8,Crime e Castigo,Fiódor Dostoiévski,1866,s
-9,A Metamorfose,Franz Kafka,1915,n
-10,Moby Dick,Herman Melville,1851,s
-11,A Divina Comédia,Dante Alighieri,1320,n
-12,Ulisses,James Joyce,1922,s
-13,Memórias Póstumas de Brás Cubas,Machado de Assis,1881,n
-14,O Processo,Franz Kafka,1925,s
-15,Grande Sertão: Veredas,João Guimarães Rosa,1956,n
-16,A Ilíada,Homero,800,s
-17,opaa,legal,789,n
+1,Dom Casmurro,Machado de Assis,1899,Companhia das Letras,Literatura Brasileira,9788535911160,12
+2,O Pequeno Principe,Antoine de Saint-Exupery,1943,Agir,Infantil,9788525406804,3
+3,1984,George Orwell,1949,Companhia Editora Nacional,Ficcao Cientifica,9788572327596,7
+4,O Senhor dos Aneis,J.R.R. Tolkien,1954,Martins Fontes,Fantasia,9788533603149,0
+5,Memorias Postumas de Bras Cubas,Machado de Assis,1881,Penguin Companhia,Literatura Brasileira,9788563560933,6
+6,Duna,Frank Herbert,1965,Aleph,Ficcao Cientifica,9788576570669,2
+7,Crime e Castigo,Fiodor Dostoievski,1866,Editora 34,Romance,9788573261097,5
+8,O Hobbit,J.R.R. Tolkien,1937,WMF Martins Fontes,Fantasia,9788578270698,0
+9,Cem Anos de Solidao,Gabriel Garcia Marquez,1967,Record,Realismo Magico,9788501009845,8
+10,A Revolucao dos Bichos,George Orwell,1945,Companhia das Letras,Ficcao Politica,9788535909555,4
+11,Ensaio sobre a Cegueira,Jose Saramago,1995,Companhia das Letras,Romance,9788571648593,6
+12,A Metamorfose,Franz Kafka,1915,L&PM Editores,Ficcao Absurdista,9788525410566,2
+13,Os Miseraveis,Victor Hugo,1862,Martin Claret,Romance Historico,9788572326834,5
+14,Admiravel Mundo Novo,Aldous Huxley,1932,Biblioteca Azul,Distopia,9788525056047,3
+15,Grande Sertao: Veredas,Joao Guimaraes Rosa,1956,Nova Fronteira,Literatura Brasileira,9788520923251,7
+16,O grande homem,Vinicius ,2026,raiz,suspense,987654,3

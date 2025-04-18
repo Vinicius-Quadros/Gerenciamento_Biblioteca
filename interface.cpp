@@ -22,7 +22,7 @@ int continuarOperacao() {
     return (resposta == 's' || resposta == 'S');
 }
 
-// Funcao para cadastrar um novo livro
+// Funcao para cadastrar um novo livro (atualizada)
 Livro* cadastrarLivro(Livro* lista) {
     limparTela();
     
@@ -30,7 +30,10 @@ Livro* cadastrarLivro(Livro* lista) {
     char titulo[100];
     char autor[100];
     int ano;
-    char emprestimo;
+    char editora[100];
+    char categoria[50];
+    char isbn[20];
+    int quantidade;
     int continuar = 1;
     
     while (continuar) {
@@ -46,7 +49,8 @@ Livro* cadastrarLivro(Livro* lista) {
         
         // Obter dados do livro
         printf("\n=== Cadastro de Livro ===\n");
-		        
+        printf("ID: %d (gerado automaticamente)\n", id);
+        
         printf("Titulo: ");
         getchar(); // Limpar o buffer do teclado
         fgets(titulo, sizeof(titulo), stdin);
@@ -58,13 +62,25 @@ Livro* cadastrarLivro(Livro* lista) {
         
         printf("Ano: ");
         scanf("%d", &ano);
+        getchar(); // Limpar o buffer
         
-        printf("Emprestado (s/n): ");
-        getchar(); // Limpar o buffer do teclado
-        scanf("%c", &emprestimo);
+        printf("Editora: ");
+        fgets(editora, sizeof(editora), stdin);
+        editora[strcspn(editora, "\n")] = '\0';
+        
+        printf("Categoria: ");
+        fgets(categoria, sizeof(categoria), stdin);
+        categoria[strcspn(categoria, "\n")] = '\0';
+        
+        printf("ISBN: ");
+        fgets(isbn, sizeof(isbn), stdin);
+        isbn[strcspn(isbn, "\n")] = '\0';
+        
+        printf("Quantidade disponivel: ");
+        scanf("%d", &quantidade);
         
         // Criar e adicionar o livro
-        Livro* novoLivro = criarLivro(id, titulo, autor, ano, emprestimo);
+        Livro* novoLivro = criarLivro(id, titulo, autor, ano, editora, categoria, isbn, quantidade);
         lista = adicionarLivro(lista, novoLivro);
         
         printf("\nLivro cadastrado com sucesso!\n");
@@ -118,17 +134,18 @@ void exibirLivros(Livro* lista) {
     do {
         limparTela();
         printf("\n=== Livros Cadastrados (Pagina %d de %d) ===\n", pagina, totalPaginas);
-        printf("ID  | Titulo                         | Autor                          | Ano  | Emprestado\n");
-        printf("----+--------------------------------+--------------------------------+------+-----------\n");
+        printf("ID    | Titulo                      | Autor                       | Ano    | Editora                     | Categoria             | ISBN               | Qtd\n");
+        printf("------+-----------------------------+-----------------------------+--------+-----------------------------+----------------------+--------------------+------\n");
         
         // Exibe os livros da página atual
         int contador = 0;
         Livro* paginaAtual = atual;
         
         while (paginaAtual != NULL && contador < livrosPorPagina) {
-            printf("%-3d | %-30s | %-30s | %-4d | %c\n", 
+            printf("%-5d | %-28s | %-28s | %-7d | %-28s | %-21s | %-19s | %-5d\n", 
                    paginaAtual->id, paginaAtual->titulo, paginaAtual->autor, 
-                   paginaAtual->ano, paginaAtual->emprestimo);
+                   paginaAtual->ano, paginaAtual->editora, paginaAtual->categoria,
+                   paginaAtual->isbn, paginaAtual->quantidade);
             
             paginaAtual = paginaAtual->prox;
             contador++;
@@ -208,104 +225,102 @@ Livro* menuOrdenacao(Livro* lista) {
     int subOpcao;
     Livro* listaOrdenada = lista;
     
-    do {
-        limparTela();
-        printf("\n=== Ordenacao de Livros ===\n");
-        printf("1. Ordenar por ID\n");
-        printf("2. Ordenar por Titulo\n");
-        printf("3. Ordenar por Autor\n");
-        printf("4. Ordenar por Ano\n");
-        printf("5. Ordenar por Status de Emprestimo\n");
-        printf("0. Voltar\n");
-        printf("Escolha uma opcao: ");
-        scanf("%d", &opcao);
-        
-        switch (opcao) {
-            case 1:
-                printf("\nOrdem: 1-Crescente | 2-Decrescente: ");
-                scanf("%d", &subOpcao);
-                if (subOpcao == 1 || subOpcao == 2) {
-                    listaOrdenada = ordenarPorId(lista, subOpcao == 1);
-                    lista = listaOrdenada; // Atualiza a lista original
-                    printf("\nLivros ordenados por ID (%s).\n", 
-                           (subOpcao == 1) ? "crescente" : "decrescente");
-                    pausar();
-                } else {
-                    printf("\nOpcao invalida!\n");
-                    pausar();
-                }
-                break;
-                
-            case 2:
-                printf("\nOrdem: 1-Alfabetica crescente | 2-Alfabetica decrescente: ");
-                scanf("%d", &subOpcao);
-                if (subOpcao == 1 || subOpcao == 2) {
-                    listaOrdenada = ordenarPorTitulo(lista, subOpcao == 1);
-                    lista = listaOrdenada; // Atualiza a lista original
-                    printf("\nLivros ordenados por Titulo (%s).\n", 
-                           (subOpcao == 1) ? "crescente" : "decrescente");
-                    pausar();
-                } else {
-                    printf("\nOpcao invalida!\n");
-                    pausar();
-                }
-                break;
-                
-            case 3:
-                printf("\nOrdem: 1-Alfabetica crescente | 2-Alfabetica decrescente: ");
-                scanf("%d", &subOpcao);
-                if (subOpcao == 1 || subOpcao == 2) {
-                    listaOrdenada = ordenarPorAutor(lista, subOpcao == 1);
-                    lista = listaOrdenada; // Atualiza a lista original
-                    printf("\nLivros ordenados por Autor (%s).\n", 
-                           (subOpcao == 1) ? "crescente" : "decrescente");
-                    pausar();
-                } else {
-                    printf("\nOpcao invalida!\n");
-                    pausar();
-                }
-                break;
-                
-            case 4:
-                printf("\nOrdem: 1-Do menor para o maior | 2-Do maior para o menor: ");
-                scanf("%d", &subOpcao);
-                if (subOpcao == 1 || subOpcao == 2) {
-                    listaOrdenada = ordenarPorAno(lista, subOpcao == 1);
-                    lista = listaOrdenada; // Atualiza a lista original
-                    printf("\nLivros ordenados por Ano (%s).\n", 
-                           (subOpcao == 1) ? "crescente" : "decrescente");
-                    pausar();
-                } else {
-                    printf("\nOpcao invalida!\n");
-                    pausar();
-                }
-                break;
-                
-            case 5:
-                printf("\nOrdem: 1-Emprestados primeiro | 2-Nao emprestados primeiro: ");
-                scanf("%d", &subOpcao);
-                if (subOpcao == 1 || subOpcao == 2) {
-                    listaOrdenada = ordenarPorEmprestimo(lista, subOpcao == 1);
-                    lista = listaOrdenada; // Atualiza a lista original
-                    printf("\nLivros ordenados por Status de Emprestimo (%s primeiro).\n", 
-                           (subOpcao == 1) ? "emprestados" : "nao emprestados");
-                    pausar();
-                } else {
-                    printf("\nOpcao invalida!\n");
-                    pausar();
-                }
-                break;
-                
-            case 0:
-                return lista; // Retorna a lista possivelmente modificada
-                
-            default:
+    limparTela();
+    printf("\n=== Ordenacao de Livros ===\n");
+    printf("1. Ordenar por ID\n");
+    printf("2. Ordenar por Titulo\n");
+    printf("3. Ordenar por Autor\n");
+    printf("4. Ordenar por Ano\n");
+    printf("5. Ordenar por Quantidade\n");
+    printf("0. Voltar\n");
+    printf("Escolha uma opcao: ");
+    scanf("%d", &opcao);
+    
+    switch (opcao) {
+        case 1:
+            printf("\nOrdem: 1-Crescente | 2-Decrescente: ");
+            scanf("%d", &subOpcao);
+            if (subOpcao == 1 || subOpcao == 2) {
+                listaOrdenada = ordenarPorId(lista, subOpcao == 1);
+                lista = listaOrdenada; // Atualiza a lista original
+                printf("\nLivros ordenados por ID (%s).\n", 
+                       (subOpcao == 1) ? "crescente" : "decrescente");
+                pausar();
+            } else {
                 printf("\nOpcao invalida!\n");
                 pausar();
-        }
-    } while (opcao != 0);
+            }
+            break;
+            
+        case 2:
+            printf("\nOrdem: 1-Alfabetica crescente | 2-Alfabetica decrescente: ");
+            scanf("%d", &subOpcao);
+            if (subOpcao == 1 || subOpcao == 2) {
+                listaOrdenada = ordenarPorTitulo(lista, subOpcao == 1);
+                lista = listaOrdenada; // Atualiza a lista original
+                printf("\nLivros ordenados por Titulo (%s).\n", 
+                       (subOpcao == 1) ? "crescente" : "decrescente");
+                pausar();
+            } else {
+                printf("\nOpcao invalida!\n");
+                pausar();
+            }
+            break;
+            
+        case 3:
+            printf("\nOrdem: 1-Alfabetica crescente | 2-Alfabetica decrescente: ");
+            scanf("%d", &subOpcao);
+            if (subOpcao == 1 || subOpcao == 2) {
+                listaOrdenada = ordenarPorAutor(lista, subOpcao == 1);
+                lista = listaOrdenada; // Atualiza a lista original
+                printf("\nLivros ordenados por Autor (%s).\n", 
+                       (subOpcao == 1) ? "crescente" : "decrescente");
+                pausar();
+            } else {
+                printf("\nOpcao invalida!\n");
+                pausar();
+            }
+            break;
+            
+        case 4:
+            printf("\nOrdem: 1-Do menor para o maior | 2-Do maior para o menor: ");
+            scanf("%d", &subOpcao);
+            if (subOpcao == 1 || subOpcao == 2) {
+                listaOrdenada = ordenarPorAno(lista, subOpcao == 1);
+                lista = listaOrdenada; // Atualiza a lista original
+                printf("\nLivros ordenados por Ano (%s).\n", 
+                       (subOpcao == 1) ? "crescente" : "decrescente");
+                pausar();
+            } else {
+                printf("\nOpcao invalida!\n");
+                pausar();
+            }
+            break;
+            
+        case 5:
+            printf("\nOrdem: 1-Do menor para o maior | 2-Do maior para o menor: ");
+            scanf("%d", &subOpcao);
+            if (subOpcao == 1 || subOpcao == 2) {
+                listaOrdenada = ordenarPorQuantidade(lista, subOpcao == 1);
+                lista = listaOrdenada; // Atualiza a lista original
+                printf("\nLivros ordenados por Quantidade (%s).\n", 
+                       (subOpcao == 1) ? "crescente" : "decrescente");
+                pausar();
+            } else {
+                printf("\nOpcao invalida!\n");
+                pausar();
+            }
+            break;
+            
+        case 0:
+            return lista;
+            
+        default:
+            printf("\nOpcao invalida!\n");
+            pausar();
+    }
     
-    return lista; // Retorna a lista possivelmente modificada
+    return lista;
 }
 
 // Funcao para o menu de busca (a ser implementado)

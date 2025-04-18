@@ -1,0 +1,17 @@
+1,Romeu e Julieta,Homero,2025,n
+2,O Senhor dos Anéis,J.R.R. Tolkien,1954,n
+3,Dom Quixote,Miguel de Cervantes,1605,s
+4,Cem Anos de Solidão,Gabriel García Márquez,1967,n
+5,1984,George Orwell,1949,s
+6,O Pequeno Príncipe,Antoine de Saint-Exupéry,1943,n
+7,Orgulho e Preconceito,Jane Austen,1813,n
+8,Crime e Castigo,Fiódor Dostoiévski,1866,s
+9,A Metamorfose,Franz Kafka,1915,n
+10,Moby Dick,Herman Melville,1851,s
+11,A Divina Comédia,Dante Alighieri,1320,n
+12,Ulisses,James Joyce,1922,s
+13,Memórias Póstumas de Brás Cubas,Machado de Assis,1881,n
+14,O Processo,Franz Kafka,1925,s
+15,Grande Sertão: Veredas,João Guimarães Rosa,1956,n
+16,A Ilíada,Homero,800,s
+17,opaa,legal,789,n

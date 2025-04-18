@@ -17,8 +17,16 @@ Livro* criarLivro(int id, char* titulo, char* autor, int ano, char emprestimo);
 Livro* adicionarLivro(Livro* lista, Livro* novoLivro);
 void liberarLivros(Livro* lista);
 
-// Novas funções para navegação bidirecional
+// Funções para navegação bidirecional
 Livro* obterPrimeiro(Livro* lista);
 Livro* obterUltimo(Livro* lista);
+Livro* menuOrdenacao(Livro* lista);
+
+// Funções para ordenação
+Livro* ordenarPorId(Livro* lista, int crescente);
+Livro* ordenarPorTitulo(Livro* lista, int crescente);
+Livro* ordenarPorAutor(Livro* lista, int crescente);
+Livro* ordenarPorAno(Livro* lista, int crescente);
+Livro* ordenarPorEmprestimo(Livro* lista, int emprestadosPrimeiro);
 
 #endif

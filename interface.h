@@ -10,7 +10,7 @@ int continuarOperacao();
 Livro* cadastrarLivro(Livro* lista);
 void exibirLivros(Livro* lista);
 void menuEmprestimos(Livro* lista);
-void menuOrdenacao(Livro* lista);
+Livro* menuOrdenacao(Livro* lista);
 void menuBusca(Livro* lista);
 
 #endif

@@ -29,7 +29,7 @@ int main() {
                 menuEmprestimos(biblioteca);
                 break;
             case 3:
-                menuOrdenacao(biblioteca);
+                biblioteca = menuOrdenacao(biblioteca);
                 break;
             case 4:
                 menuBusca(biblioteca);

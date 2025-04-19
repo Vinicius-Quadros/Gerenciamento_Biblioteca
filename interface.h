@@ -12,5 +12,6 @@ void exibirLivros(Livro* lista);
 void menuEmprestimos(Livro* lista);
 Livro* menuOrdenacao(Livro* lista);
 void menuBusca(Livro* lista);
+int exibirResultadoBusca(Livro* lista, char* criterioBusca, char* textoBusca);
 
 #endif

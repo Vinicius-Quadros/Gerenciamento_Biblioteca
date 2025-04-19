@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "livro.h"
+#include <ctype.h>
 
 // Funcao para criar um novo livro
 // Funcao para criar um novo livro (atualizada)
@@ -256,4 +257,155 @@ Livro* ordenarPorCategoria(Livro* lista, int crescente) {
 
 Livro* ordenarPorISBN(Livro* lista, int crescente) {
     return bubbleSort(lista, comparaISBN, crescente);
+}
+
+// Função para buscar por ID
+Livro* buscarPorId(Livro* lista, int id) {
+    Livro* resultado = NULL;
+    Livro* atual = obterPrimeiro(lista);
+    
+    while (atual != NULL) {
+        if (atual->id == id) {
+            // Cria uma cópia do livro encontrado
+            Livro* copiaLivro = criarLivro(atual->id, atual->titulo, atual->autor, atual->ano, 
+                                          atual->editora, atual->categoria, atual->isbn, 
+                                          atual->quantidade);
+            resultado = adicionarLivro(resultado, copiaLivro);
+        }
+        atual = atual->prox;
+    }
+    
+    return resultado;
+}
+
+// Função auxiliar para verificar se uma string contém outra (ignorando maiúsculas/minúsculas)
+int contemString(char* str, char* busca) {
+    char strLower[256] = {0};
+    char buscaLower[256] = {0};
+    
+    // Convertendo para minúsculas
+    for (int i = 0; str[i] != '\0'; i++) {
+        strLower[i] = tolower(str[i]);
+    }
+    
+    for (int i = 0; busca[i] != '\0'; i++) {
+        buscaLower[i] = tolower(busca[i]);
+    }
+    
+    // Verifica se a string de busca está contida na string original
+    return strstr(strLower, buscaLower) != NULL;
+}
+
+// Função para buscar por Título
+Livro* buscarPorTitulo(Livro* lista, char* texto) {
+    Livro* resultado = NULL;
+    Livro* atual = obterPrimeiro(lista);
+    
+    while (atual != NULL) {
+        if (contemString(atual->titulo, texto)) {
+            // Cria uma cópia do livro encontrado
+            Livro* copiaLivro = criarLivro(atual->id, atual->titulo, atual->autor, atual->ano, 
+                                          atual->editora, atual->categoria, atual->isbn, 
+                                          atual->quantidade);
+            resultado = adicionarLivro(resultado, copiaLivro);
+        }
+        atual = atual->prox;
+    }
+    
+    return resultado;
+}
+
+// Função para buscar por Autor
+Livro* buscarPorAutor(Livro* lista, char* texto) {
+    Livro* resultado = NULL;
+    Livro* atual = obterPrimeiro(lista);
+    
+    while (atual != NULL) {
+        if (contemString(atual->autor, texto)) {
+            // Cria uma cópia do livro encontrado
+            Livro* copiaLivro = criarLivro(atual->id, atual->titulo, atual->autor, atual->ano, 
+                                          atual->editora, atual->categoria, atual->isbn, 
+                                          atual->quantidade);
+            resultado = adicionarLivro(resultado, copiaLivro);
+        }
+        atual = atual->prox;
+    }
+    
+    return resultado;
+}
+
+// Função para buscar por Ano
+Livro* buscarPorAno(Livro* lista, int ano) {
+    Livro* resultado = NULL;
+    Livro* atual = obterPrimeiro(lista);
+    
+    while (atual != NULL) {
+        if (atual->ano == ano) {
+            // Cria uma cópia do livro encontrado
+            Livro* copiaLivro = criarLivro(atual->id, atual->titulo, atual->autor, atual->ano, 
+                                          atual->editora, atual->categoria, atual->isbn, 
+                                          atual->quantidade);
+            resultado = adicionarLivro(resultado, copiaLivro);
+        }
+        atual = atual->prox;
+    }
+    
+    return resultado;
+}
+
+// Função para buscar por Editora
+Livro* buscarPorEditora(Livro* lista, char* texto) {
+    Livro* resultado = NULL;
+    Livro* atual = obterPrimeiro(lista);
+    
+    while (atual != NULL) {
+        if (contemString(atual->editora, texto)) {
+            // Cria uma cópia do livro encontrado
+            Livro* copiaLivro = criarLivro(atual->id, atual->titulo, atual->autor, atual->ano, 
+                                          atual->editora, atual->categoria, atual->isbn, 
+                                          atual->quantidade);
+            resultado = adicionarLivro(resultado, copiaLivro);
+        }
+        atual = atual->prox;
+    }
+    
+    return resultado;
+}
+
+// Função para buscar por Categoria
+Livro* buscarPorCategoria(Livro* lista, char* texto) {
+    Livro* resultado = NULL;
+    Livro* atual = obterPrimeiro(lista);
+    
+    while (atual != NULL) {
+        if (contemString(atual->categoria, texto)) {
+            // Cria uma cópia do livro encontrado
+            Livro* copiaLivro = criarLivro(atual->id, atual->titulo, atual->autor, atual->ano, 
+                                          atual->editora, atual->categoria, atual->isbn, 
+                                          atual->quantidade);
+            resultado = adicionarLivro(resultado, copiaLivro);
+        }
+        atual = atual->prox;
+    }
+    
+    return resultado;
+}
+
+// Função para buscar por ISBN
+Livro* buscarPorISBN(Livro* lista, char* texto) {
+    Livro* resultado = NULL;
+    Livro* atual = obterPrimeiro(lista);
+    
+    while (atual != NULL) {
+        if (contemString(atual->isbn, texto)) {
+            // Cria uma cópia do livro encontrado
+            Livro* copiaLivro = criarLivro(atual->id, atual->titulo, atual->autor, atual->ano, 
+                                          atual->editora, atual->categoria, atual->isbn, 
+                                          atual->quantidade);
+            resultado = adicionarLivro(resultado, copiaLivro);
+        }
+        atual = atual->prox;
+    }
+    
+    return resultado;
 }

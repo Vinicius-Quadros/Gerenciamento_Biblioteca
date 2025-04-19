@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "interface.h"
 #include "livro.h"
 #include "arquivo.h"
@@ -371,10 +372,228 @@ Livro* menuOrdenacao(Livro* lista) {
     return lista;
 }
 
-// Funcao para o menu de busca (a ser implementado)
-void menuBusca(Livro* lista) {
+// Função para exibir o resultado da busca
+int exibirResultadoBusca(Livro* lista, char* criterioBusca, char* textoBusca) {
     limparTela();
-    printf("\n=== Busca Avancada ===\n");
-    printf("Funcionalidade em desenvolvimento.\n");
-    continuarOperacao();
+    
+    if (lista == NULL) {
+        printf("\nNenhum livro encontrado para a busca: '%s' em %s!\n", textoBusca, criterioBusca);
+        printf("\nDeseja realizar uma nova busca? (s/n): ");
+        char resposta;
+        scanf(" %c", &resposta);
+        // Retorna 1 se deseja nova busca, 0 caso contrário
+        return (resposta == 's' || resposta == 'S');
+    }
+    
+    // Obtém o primeiro livro da lista
+    Livro* atual = obterPrimeiro(lista);
+    int pagina = 1;
+    int livrosPorPagina = 5;
+    char opcao;
+    
+    // Contar total de livros encontrados
+    int totalLivros = 0;
+    Livro* contador = atual;
+    while (contador != NULL) {
+        totalLivros++;
+        contador = contador->prox;
+    }
+    
+    int totalPaginas = (totalLivros + livrosPorPagina - 1) / livrosPorPagina;
+    
+    do {
+        limparTela();
+        printf("\n=== Resultados da Busca por '%s' em %s (Pagina %d de %d) ===\n", 
+               textoBusca, criterioBusca, pagina, totalPaginas);
+        printf("ID    | Titulo                      | Autor                       | Ano    | Editora                     | Categoria             | ISBN               | Qtd\n");
+        printf("------+-----------------------------+-----------------------------+--------+-----------------------------+----------------------+--------------------+------\n");
+        
+        // Exibe os livros da página atual
+        int contador = 0;
+        Livro* paginaAtual = atual;
+        
+        while (paginaAtual != NULL && contador < livrosPorPagina) {
+            printf("%-5d | %-28s | %-28s | %-7d | %-28s | %-21s | %-19s | %-5d\n", 
+                   paginaAtual->id, paginaAtual->titulo, paginaAtual->autor, 
+                   paginaAtual->ano, paginaAtual->editora, paginaAtual->categoria,
+                   paginaAtual->isbn, paginaAtual->quantidade);
+            
+            paginaAtual = paginaAtual->prox;
+            contador++;
+        }
+        
+        // Verificar se estamos na primeira ou última página para mostrar orientações apropriadas
+        if (pagina == 1 && pagina == totalPaginas) {
+            printf("\nNavegacao: [S] Sair\n");
+        } else if (pagina == 1) {
+            printf("\nNavegacao: [P] Proximo | [S] Sair\n");
+        } else if (pagina == totalPaginas) {
+            printf("\nNavegacao: [A] Anterior | [S] Sair\n");
+        } else {
+            printf("\nNavegacao: [A] Anterior | [P] Proximo | [S] Sair\n");
+        }
+        
+        printf("Opcao: ");
+        scanf(" %c", &opcao);
+        
+        switch(opcao) {
+            case 'P':
+            case 'p':
+                if (pagina < totalPaginas) {
+                    for (int i = 0; i < livrosPorPagina && atual != NULL; i++) {
+                        if (atual->prox != NULL) {
+                            atual = atual->prox;
+                        }
+                    }
+                    pagina++;
+                }
+                break;
+            
+            case 'A':
+            case 'a':
+                if (pagina > 1) {
+                    for (int i = 0; i < livrosPorPagina && atual != NULL; i++) {
+                        if (atual->ant != NULL) {
+                            atual = atual->ant;
+                        }
+                    }
+                    pagina--;
+                }
+                break;
+                
+            case 'S':
+            case 's':
+                // Liberar memória da lista de resultados
+                liberarLivros(lista);
+                
+                // Perguntar se deseja fazer nova busca
+                printf("\nDeseja realizar uma nova busca? (s/n): ");
+                char resposta;
+                scanf(" %c", &resposta);
+                
+                // Retorna 1 se deseja nova busca, 0 caso contrário
+                return (resposta == 's' || resposta == 'S');
+        }
+        
+    } while (1);
 }
+
+// Funcao para o menu de busca avancada (modificada para implementar o loop de busca)
+void menuBusca(Livro* lista) {
+    if (lista == NULL) {
+        limparTela();
+        printf("\nNenhum livro cadastrado para buscar!\n");
+        pausar();
+        return;
+    }
+    
+    int novaBusca = 1;
+    
+    while (novaBusca) {
+        int opcao;
+        Livro* resultado = NULL;
+        
+        limparTela();
+        printf("\n=== Busca Avancada de Obras ===\n");
+        printf("1. Buscar por ID\n");
+        printf("2. Buscar por Titulo\n");
+        printf("3. Buscar por Autor\n");
+        printf("4. Buscar por Ano\n");
+        printf("5. Buscar por Editora\n");
+        printf("6. Buscar por Categoria\n");
+        printf("7. Buscar por ISBN\n");
+        printf("0. Voltar\n");
+        printf("Escolha uma opcao: ");
+        scanf("%d", &opcao);
+        
+        if (opcao == 0) {
+            return;
+        }
+        
+        // Variáveis para armazenar os dados de busca
+        int idBusca;
+        int anoBusca;
+        char textoBusca[100];
+        char criterioBusca[20];
+        
+        switch (opcao) {
+            case 1:
+                strcpy(criterioBusca, "ID");
+                printf("\nDigite o ID a ser buscado: ");
+                scanf("%d", &idBusca);
+                resultado = buscarPorId(lista, idBusca);
+                sprintf(textoBusca, "%d", idBusca); // Converte o ID para string para exibição
+                novaBusca = exibirResultadoBusca(resultado, criterioBusca, textoBusca);
+                break;
+                
+            case 2:
+                strcpy(criterioBusca, "Titulo");
+                printf("\nDigite o termo a ser buscado no titulo: ");
+                getchar(); // Limpar o buffer do teclado
+                fgets(textoBusca, sizeof(textoBusca), stdin);
+                textoBusca[strcspn(textoBusca, "\n")] = '\0'; // Remover a quebra de linha
+                resultado = buscarPorTitulo(lista, textoBusca);
+                novaBusca = exibirResultadoBusca(resultado, criterioBusca, textoBusca);
+                break;
+                
+            case 3:
+                strcpy(criterioBusca, "Autor");
+                printf("\nDigite o termo a ser buscado no autor: ");
+                getchar(); // Limpar o buffer do teclado
+                fgets(textoBusca, sizeof(textoBusca), stdin);
+                textoBusca[strcspn(textoBusca, "\n")] = '\0'; // Remover a quebra de linha
+                resultado = buscarPorAutor(lista, textoBusca);
+                novaBusca = exibirResultadoBusca(resultado, criterioBusca, textoBusca);
+                break;
+                
+            case 4:
+                strcpy(criterioBusca, "Ano");
+                printf("\nDigite o ano a ser buscado: ");
+                scanf("%d", &anoBusca);
+                resultado = buscarPorAno(lista, anoBusca);
+                sprintf(textoBusca, "%d", anoBusca); // Converte o ano para string para exibição
+                novaBusca = exibirResultadoBusca(resultado, criterioBusca, textoBusca);
+                break;
+                
+            case 5:
+                strcpy(criterioBusca, "Editora");
+                printf("\nDigite o termo a ser buscado na editora: ");
+                getchar(); // Limpar o buffer do teclado
+                fgets(textoBusca, sizeof(textoBusca), stdin);
+                textoBusca[strcspn(textoBusca, "\n")] = '\0'; // Remover a quebra de linha
+                resultado = buscarPorEditora(lista, textoBusca);
+                novaBusca = exibirResultadoBusca(resultado, criterioBusca, textoBusca);
+                break;
+                
+            case 6:
+                strcpy(criterioBusca, "Categoria");
+                printf("\nDigite o termo a ser buscado na categoria: ");
+                getchar(); // Limpar o buffer do teclado
+                fgets(textoBusca, sizeof(textoBusca), stdin);
+                textoBusca[strcspn(textoBusca, "\n")] = '\0'; // Remover a quebra de linha
+                resultado = buscarPorCategoria(lista, textoBusca);
+                novaBusca = exibirResultadoBusca(resultado, criterioBusca, textoBusca);
+                break;
+                
+            case 7:
+                strcpy(criterioBusca, "ISBN");
+                printf("\nDigite o termo a ser buscado no ISBN: ");
+                getchar(); // Limpar o buffer do teclado
+                fgets(textoBusca, sizeof(textoBusca), stdin);
+                textoBusca[strcspn(textoBusca, "\n")] = '\0'; // Remover a quebra de linha
+                resultado = buscarPorISBN(lista, textoBusca);
+                novaBusca = exibirResultadoBusca(resultado, criterioBusca, textoBusca);
+                break;
+                
+            default:
+                printf("\nOpcao invalida!\n");
+                pausar();
+                novaBusca = 1; // Mantém o loop
+        }
+    }
+}
+
+
+
+
+

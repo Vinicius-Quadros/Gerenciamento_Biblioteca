@@ -34,7 +34,15 @@ Livro* ordenarPorAno(Livro* lista, int crescente);
 Livro* ordenarPorEditora(Livro* lista, int crescente);
 Livro* ordenarPorCategoria(Livro* lista, int crescente);
 Livro* ordenarPorISBN(Livro* lista, int crescente);
-// Podemos adicionar ordenação por quantidade
 Livro* ordenarPorQuantidade(Livro* lista, int crescente);
 
+
+// Funções para Busca 
+Livro* buscarPorId(Livro* lista, int id);
+Livro* buscarPorTitulo(Livro* lista, char* texto);
+Livro* buscarPorAutor(Livro* lista, char* texto);
+Livro* buscarPorAno(Livro* lista, int ano);
+Livro* buscarPorEditora(Livro* lista, char* texto);
+Livro* buscarPorCategoria(Livro* lista, char* texto);
+Livro* buscarPorISBN(Livro* lista, char* texto);
 #endif

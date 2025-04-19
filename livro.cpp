@@ -209,6 +209,21 @@ int comparaQuantidade(Livro* a, Livro* b, int crescente) {
         return b->quantidade - a->quantidade;
 }
 
+int comparaEditora(Livro* a, Livro* b, int crescente) {
+    int resultado = strcasecmp(a->editora, b->editora);
+    return crescente ? resultado : -resultado;
+}
+
+int comparaCategoria(Livro* a, Livro* b, int crescente) {
+    int resultado = strcasecmp(a->categoria, b->categoria);
+    return crescente ? resultado : -resultado;
+}
+
+int comparaISBN(Livro* a, Livro* b, int crescente) {
+    int resultado = strcmp(a->isbn, b->isbn);
+    return crescente ? resultado : -resultado;
+}
+
 
 // Implementação das funções de ordenação
 Livro* ordenarPorId(Livro* lista, int crescente) {
@@ -231,3 +246,14 @@ Livro* ordenarPorQuantidade(Livro* lista, int crescente) {
     return bubbleSort(lista, comparaQuantidade, crescente);
 }
 
+Livro* ordenarPorEditora(Livro* lista, int crescente) {
+    return bubbleSort(lista, comparaEditora, crescente);
+}
+
+Livro* ordenarPorCategoria(Livro* lista, int crescente) {
+    return bubbleSort(lista, comparaCategoria, crescente);
+}
+
+Livro* ordenarPorISBN(Livro* lista, int crescente) {
+    return bubbleSort(lista, comparaISBN, crescente);
+}

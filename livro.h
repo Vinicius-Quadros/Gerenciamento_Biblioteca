@@ -31,6 +31,9 @@ Livro* ordenarPorId(Livro* lista, int crescente);
 Livro* ordenarPorTitulo(Livro* lista, int crescente);
 Livro* ordenarPorAutor(Livro* lista, int crescente);
 Livro* ordenarPorAno(Livro* lista, int crescente);
+Livro* ordenarPorEditora(Livro* lista, int crescente);
+Livro* ordenarPorCategoria(Livro* lista, int crescente);
+Livro* ordenarPorISBN(Livro* lista, int crescente);
 // Podemos adicionar ordenação por quantidade
 Livro* ordenarPorQuantidade(Livro* lista, int crescente);
 

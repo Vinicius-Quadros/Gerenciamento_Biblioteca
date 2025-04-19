@@ -3,10 +3,12 @@
 #include "livro.h"
 #include "arquivo.h"
 #include "interface.h"
+#include "emprestimo.h"
 
 // Funcao principal
 int main() {
     Livro* biblioteca = carregarLivros();
+    Emprestimo* emprestimos = carregarEmprestimos();
     int opcao;
     
     do {
@@ -26,7 +28,7 @@ int main() {
                 biblioteca = cadastrarLivro(biblioteca);
                 break;
             case 2:
-                menuEmprestimos(biblioteca);
+                emprestimos = menuEmprestimos(biblioteca, emprestimos);
                 break;
             case 3:
                 biblioteca = menuOrdenacao(biblioteca);
@@ -35,7 +37,7 @@ int main() {
                 menuBusca(biblioteca);
                 break;
             case 5:
-                exibirLivros(biblioteca);
+                exibirLivros(biblioteca, emprestimos);
                 break;
             case 0:
                 limparTela();
@@ -47,8 +49,9 @@ int main() {
         }
     } while (opcao != 0);
     
-    // Liberar memoria alocada
+    // Liberar memória alocada
     liberarLivros(biblioteca);
+    liberarEmprestimos(emprestimos);
     
     return 0;
 }

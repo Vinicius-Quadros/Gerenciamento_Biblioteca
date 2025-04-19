@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include "interface.h"
 #include "livro.h"
+#include "emprestimo.h"
 #include "arquivo.h"
 
 // Funcao para limpar a tela (compativel com Windows e sistemas Unix)
@@ -107,7 +108,7 @@ void pausar() {
 }
 
 // Funcao para exibir todos os livros (com navegação bidirecional)
-void exibirLivros(Livro* lista) {
+void exibirLivros(Livro* lista, Emprestimo* listaEmprestimos) {
     limparTela();
     
     if (lista == NULL) {
@@ -135,18 +136,28 @@ void exibirLivros(Livro* lista) {
     do {
         limparTela();
         printf("\n=== Livros Cadastrados (Pagina %d de %d) ===\n", pagina, totalPaginas);
-        printf("ID    | Titulo                      | Autor                       | Ano    | Editora                     | Categoria             | ISBN               | Qtd\n");
-        printf("------+-----------------------------+-----------------------------+--------+-----------------------------+----------------------+--------------------+------\n");
+        printf("ID    | Titulo                      | Autor                       | Ano    | Editora                     | Categoria             | ISBN               | Qtd | Emprestados\n");
+        printf("------+-----------------------------+-----------------------------+--------+-----------------------------+----------------------+--------------------+-----+------------\n");
         
         // Exibe os livros da página atual
         int contador = 0;
         Livro* paginaAtual = atual;
         
         while (paginaAtual != NULL && contador < livrosPorPagina) {
-            printf("%-5d | %-28s | %-28s | %-7d | %-28s | %-21s | %-19s | %-5d\n", 
+            // Contar quantos exemplares deste livro estão emprestados
+            int emprestados = 0;
+            Emprestimo* empAtual = listaEmprestimos;
+            while (empAtual != NULL) {
+                if (empAtual->idLivro == paginaAtual->id) {
+                    emprestados++;
+                }
+                empAtual = empAtual->prox;
+            }
+            
+            printf("%-5d | %-28s | %-28s | %-7d | %-28s | %-21s | %-19s | %-4d | %-11d\n", 
                    paginaAtual->id, paginaAtual->titulo, paginaAtual->autor, 
                    paginaAtual->ano, paginaAtual->editora, paginaAtual->categoria,
-                   paginaAtual->isbn, paginaAtual->quantidade);
+                   paginaAtual->isbn, paginaAtual->quantidade, emprestados);
             
             paginaAtual = paginaAtual->prox;
             contador++;
@@ -169,7 +180,6 @@ void exibirLivros(Livro* lista) {
         switch(opcao) {
             case 'P':
             case 'p':
-                // Avança para a próxima página apenas se não estiver na última
                 if (pagina < totalPaginas) {
                     for (int i = 0; i < livrosPorPagina && atual != NULL; i++) {
                         if (atual->prox != NULL) {
@@ -182,7 +192,6 @@ void exibirLivros(Livro* lista) {
             
             case 'A':
             case 'a':
-                // Volta para a página anterior apenas se não estiver na primeira
                 if (pagina > 1) {
                     for (int i = 0; i < livrosPorPagina && atual != NULL; i++) {
                         if (atual->ant != NULL) {
@@ -203,14 +212,6 @@ void exibirLivros(Livro* lista) {
         }
         
     } while (1); // Loop infinito, sai apenas com a opção 'S'
-}
-
-// Funcao para o menu de emprestimos (a ser implementado)
-void menuEmprestimos(Livro* lista) {
-    limparTela();
-    printf("\n=== Controle de Emprestimos ===\n");
-    printf("Funcionalidade em desenvolvimento.\n");
-    continuarOperacao();
 }
 
 // Funcao para o menu de ordenacao
@@ -594,6 +595,365 @@ void menuBusca(Livro* lista) {
 }
 
 
+Emprestimo* registrarEmprestimo(Livro* listaLivros, Emprestimo* listaEmprestimos) {
+    limparTela();
+    
+    if (listaLivros == NULL) {
+        printf("\nNenhum livro cadastrado para emprestar!\n");
+        pausar();
+        return listaEmprestimos;
+    }
+    
+    int idLivro;
+    char nomePessoa[100];
+    char telefone[20];
+    int diasEmprestimo = 14; // Padrão: 14 dias
+    
+    printf("\n=== Registrar Emprestimo ===\n");
+    
+    // Solicitar ID do livro
+    printf("Digite o ID do livro a ser emprestado: ");
+    scanf("%d", &idLivro);
+    
+    // Verificar se o livro existe e está disponível
+    Livro* livro = NULL;
+    Livro* atual = obterPrimeiro(listaLivros);
+    while (atual != NULL) {
+        if (atual->id == idLivro) {
+            livro = atual;
+            break;
+        }
+        atual = atual->prox;
+    }
+    
+    if (livro == NULL) {
+        printf("\nLivro com ID %d nao encontrado!\n", idLivro);
+        pausar();
+        return listaEmprestimos;
+    }
+    
+    // Verificar quantos exemplares já estão emprestados
+    int emprestados = 0;
+    Emprestimo* empAtual = listaEmprestimos;
+    while (empAtual != NULL) {
+        if (empAtual->idLivro == idLivro) {
+            emprestados++;
+        }
+        empAtual = empAtual->prox;
+    }
+    
+    // Verificar se ainda há exemplares disponíveis
+    if (emprestados >= livro->quantidade) {
+        printf("\nNao ha exemplares disponiveis deste livro!\n");
+        printf("Total de exemplares: %d\n", livro->quantidade);
+        printf("Exemplares emprestados: %d\n", emprestados);
+        pausar();
+        return listaEmprestimos;
+    }
+    
+    // Solicitar dados da pessoa
+    printf("Nome da pessoa: ");
+    getchar(); // Limpar buffer
+    fgets(nomePessoa, sizeof(nomePessoa), stdin);
+    nomePessoa[strcspn(nomePessoa, "\n")] = '\0'; // Remover quebra de linha
+    
+    printf("Telefone: ");
+    fgets(telefone, sizeof(telefone), stdin);
+    telefone[strcspn(telefone, "\n")] = '\0'; // Remover quebra de linha
+    
+    printf("Dias de emprestimo (padrao: 14): ");
+    int temp;
+    if (scanf("%d", &temp) == 1 && temp > 0) {
+        diasEmprestimo = temp;
+    } else {
+        getchar(); // Limpar buffer em caso de entrada inválida
+    }
+    
+    // Gerar ID para o empréstimo
+    int idEmprestimo = 1;
+    empAtual = listaEmprestimos;
+    while (empAtual != NULL) {
+        if (empAtual->id >= idEmprestimo) {
+            idEmprestimo = empAtual->id + 1;
+        }
+        empAtual = empAtual->prox;
+    }
+    
+    // Obter datas
+    time_t dataEmprestimo = obterDataAtual();
+    time_t dataDevolucao = calcularDataDevolucao(dataEmprestimo, diasEmprestimo);
+    
+    // Criar e adicionar o empréstimo
+    Emprestimo* novoEmprestimo = criarEmprestimo(idEmprestimo, idLivro, livro->titulo, 
+                                                nomePessoa, telefone, dataEmprestimo, dataDevolucao);
+    listaEmprestimos = adicionarEmprestimo(listaEmprestimos, novoEmprestimo);
+    
+    // Salvar alterações
+    salvarEmprestimos(listaEmprestimos);
+    
+    // Exibir resumo do empréstimo
+    limparTela();
+    char dataEmpStr[20], dataDevStr[20];
+    
+    printf("\n=== Emprestimo Registrado com Sucesso ===\n");
+    printf("ID do Emprestimo: %d\n", idEmprestimo);
+    printf("Livro: %s (ID: %d)\n", livro->titulo, livro->id);
+    printf("Pessoa: %s\n", nomePessoa);
+    printf("Telefone: %s\n", telefone);
+    printf("Data do Emprestimo: %s\n", formatarData(dataEmprestimo, dataEmpStr));
+    printf("Data de Devolucao: %s\n", formatarData(dataDevolucao, dataDevStr));
+    printf("Dias de Emprestimo: %d\n", diasEmprestimo);
+    printf("Exemplares disponiveis: %d de %d\n", livro->quantidade - emprestados - 1, livro->quantidade);
+    
+    pausar();
+    return listaEmprestimos;
+}
+
+// Função para exibir todos os empréstimos
+void exibirEmprestimos(Emprestimo* lista) {
+    limparTela();
+    
+    if (lista == NULL) {
+        printf("\nNenhum emprestimo registrado!\n");
+        pausar();
+        return;
+    }
+    
+    // Obtém o primeiro empréstimo da lista
+    Emprestimo* atual = obterPrimeiroEmprestimo(lista);
+    int pagina = 1;
+    int empPorPagina = 5; // Número de empréstimos exibidos por página
+    char opcao;
+    
+    // Contar total de empréstimos
+    int totalEmp = 0;
+    Emprestimo* contador = atual;
+    while (contador != NULL) {
+        totalEmp++;
+        contador = contador->prox;
+    }
+    
+    int totalPaginas = (totalEmp + empPorPagina - 1) / empPorPagina; // Arredonda para cima
+    
+    do {
+        limparTela();
+        printf("\n=== Emprestimos Registrados (Pagina %d de %d) ===\n", pagina, totalPaginas);
+        printf("ID    | Livro                       | ID Livro | Pessoa                      | Telefone        | Emprestimo   | Devolucao\n");
+        printf("------+-----------------------------+----------+-----------------------------+-----------------+--------------+-------------\n");
+        
+        // Exibe os empréstimos da página atual
+        int contador = 0;
+        Emprestimo* paginaAtual = atual;
+        
+        while (paginaAtual != NULL && contador < empPorPagina) {
+            char dataEmpStr[20], dataDevStr[20];
+            
+            printf("%-5d | %-28s | %-8d | %-28s | %-15s | %-12s | %-12s\n", 
+                   paginaAtual->id, paginaAtual->nomeLivro, paginaAtual->idLivro, 
+                   paginaAtual->nomePessoa, paginaAtual->telefone, 
+                   formatarData(paginaAtual->dataEmprestimo, dataEmpStr),
+                   formatarData(paginaAtual->dataDevolucao, dataDevStr));
+            
+            paginaAtual = paginaAtual->prox;
+            contador++;
+        }
+        
+        // Verificar se estamos na primeira ou última página para mostrar orientações apropriadas
+        if (pagina == 1 && pagina == totalPaginas) {
+            printf("\nNavegacao: [S] Sair\n");
+        } else if (pagina == 1) {
+            printf("\nNavegacao: [P] Proximo | [S] Sair\n");
+        } else if (pagina == totalPaginas) {
+            printf("\nNavegacao: [A] Anterior | [S] Sair\n");
+        } else {
+            printf("\nNavegacao: [A] Anterior | [P] Proximo | [S] Sair\n");
+        }
+        
+        printf("Opcao: ");
+        scanf(" %c", &opcao);
+        
+        switch(opcao) {
+            case 'P':
+            case 'p':
+                if (pagina < totalPaginas) {
+                    for (int i = 0; i < empPorPagina && atual != NULL; i++) {
+                        if (atual->prox != NULL) {
+                            atual = atual->prox;
+                        }
+                    }
+                    pagina++;
+                }
+                break;
+            
+            case 'A':
+            case 'a':
+                if (pagina > 1) {
+                    for (int i = 0; i < empPorPagina && atual != NULL; i++) {
+                        if (atual->ant != NULL) {
+                            atual = atual->ant;
+                        }
+                    }
+                    pagina--;
+                }
+                break;
+                
+            case 'S':
+            case 's':
+                return;
+                
+            default:
+                printf("\nOpcao invalida!\n");
+                pausar();
+        }
+        
+    } while (1); // Loop infinito, sai apenas com a opção 'S'
+}
+
+// Função para registrar devolução de livro
+void registrarDevolucao(Livro* listaLivros, Emprestimo** listaEmprestimos) {
+    limparTela();
+    
+    if (*listaEmprestimos == NULL) {
+        printf("\nNenhum emprestimo registrado para devolver!\n");
+        pausar();
+        return;
+    }
+    
+    int idEmprestimo;
+    printf("\n=== Registrar Devolucao ===\n");
+    printf("Digite o ID do emprestimo a ser devolvido: ");
+    scanf("%d", &idEmprestimo);
+    
+    // Buscar o empréstimo
+    Emprestimo* emprestimo = NULL;
+    Emprestimo* atual = obterPrimeiroEmprestimo(*listaEmprestimos);
+    
+    while (atual != NULL) {
+        if (atual->id == idEmprestimo) {
+            emprestimo = atual;
+            break;
+        }
+        atual = atual->prox;
+    }
+    
+    if (emprestimo == NULL) {
+        printf("\nEmprestimo com ID %d nao encontrado!\n", idEmprestimo);
+        pausar();
+        return;
+    }
+    
+    // Buscar o livro para exibir informações
+    Livro* livro = NULL;
+    Livro* livroAtual = obterPrimeiro(listaLivros);
+    
+    while (livroAtual != NULL) {
+        if (livroAtual->id == emprestimo->idLivro) {
+            livro = livroAtual;
+            break;
+        }
+        livroAtual = livroAtual->prox;
+    }
+    
+    // Contar quantos exemplares estão emprestados (incluindo este)
+    int emprestados = 0;
+    atual = obterPrimeiroEmprestimo(*listaEmprestimos);
+    while (atual != NULL) {
+        if (atual->idLivro == emprestimo->idLivro) {
+            emprestados++;
+        }
+        atual = atual->prox;
+    }
+    
+    // Remover o empréstimo da lista
+    if (*listaEmprestimos == emprestimo && emprestimo->prox == NULL) {
+        // É o único elemento da lista
+        free(emprestimo);
+        *listaEmprestimos = NULL;
+    } else if (*listaEmprestimos == emprestimo) {
+        // É o primeiro elemento
+        *listaEmprestimos = emprestimo->prox;
+        (*listaEmprestimos)->ant = NULL;
+        free(emprestimo);
+    } else {
+        // Está no meio ou no final
+        Emprestimo* anterior = emprestimo->ant;
+        Emprestimo* proximo = emprestimo->prox;
+        
+        if (anterior != NULL) {
+            anterior->prox = proximo;
+        }
+        if (proximo != NULL) {
+            proximo->ant = anterior;
+        }
+        
+        free(emprestimo);
+    }
+    
+    // Exibir informações da devolução
+    char dataEmpStr[20], dataDevStr[20];
+    printf("\n=== Devolucao Registrada com Sucesso ===\n");
+    printf("Livro: %s (ID: %d)\n", emprestimo->nomeLivro, emprestimo->idLivro);
+    printf("Pessoa: %s\n", emprestimo->nomePessoa);
+    printf("Data do Emprestimo: %s\n", formatarData(emprestimo->dataEmprestimo, dataEmpStr));
+    printf("Data de Devolucao Prevista: %s\n", formatarData(emprestimo->dataDevolucao, dataDevStr));
+    
+    if (livro != NULL) {
+        printf("Exemplares disponiveis: %d de %d\n", livro->quantidade - emprestados + 1, livro->quantidade);
+    }
+    
+    // Verificar atraso
+    time_t dataAtual = obterDataAtual();
+    if (dataAtual > emprestimo->dataDevolucao) {
+        int diasAtraso = (dataAtual - emprestimo->dataDevolucao) / (24 * 60 * 60);
+        printf("\nATENCAO: Devolucao com %d dias de atraso!\n", diasAtraso);
+    } else {
+        printf("\nDevolucao realizada dentro do prazo.\n");
+    }
+    
+    // Salvar alterações
+    salvarEmprestimos(*listaEmprestimos);
+    
+    pausar();
+}
+
+// Função para o menu de empréstimos
+Emprestimo* menuEmprestimos(Livro* listaLivros, Emprestimo* listaEmprestimos) {
+    int opcao;
+    
+    do {
+        limparTela();
+        printf("\n=== Controle de Emprestimos ===\n");
+        printf("1. Registrar Emprestimo\n");
+        printf("2. Registrar Devolucao\n");
+        printf("3. Exibir Emprestimos\n");
+        printf("0. Voltar\n");
+        printf("Escolha uma opcao: ");
+        scanf("%d", &opcao);
+        
+        switch (opcao) {
+            case 1:
+                listaEmprestimos = registrarEmprestimo(listaLivros, listaEmprestimos);
+                break;
+                
+            case 2:
+                registrarDevolucao(listaLivros, &listaEmprestimos);
+                break;
+                
+            case 3:
+                exibirEmprestimos(listaEmprestimos);
+                break;
+                
+            case 0:
+                return listaEmprestimos;
+                
+            default:
+                printf("\nOpcao invalida!\n");
+                pausar();
+        }
+    } while (opcao != 0);
+    
+    return listaEmprestimos;
+}
 
 
 

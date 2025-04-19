@@ -3,7 +3,7 @@
 3,1984,George Orwell,1949,Companhia Editora Nacional,Ficcao Cientifica,9788572327596,7
 4,O Senhor dos Aneis,J.R.R. Tolkien,1954,Martins Fontes,Fantasia,9788533603149,0
 5,Memorias Postumas de Bras Cubas,Machado de Assis,1881,Penguin Companhia,Literatura Brasileira,9788563560933,6
-6,Duna,Frank Herbert,1965,Aleph,Ficcao Cientifica,9788576570669,2
+6,Duna,Frank Herbert,1965,Aleph,Ficcao Cientifica,9788576570669,1
 7,Crime e Castigo,Fiodor Dostoievski,1866,Editora 34,Romance,9788573261097,5
 8,O Hobbit,J.R.R. Tolkien,1937,WMF Martins Fontes,Fantasia,9788578270698,0
 9,Cem Anos de Solidao,Gabriel Garcia Marquez,1967,Record,Realismo Magico,9788501009845,8

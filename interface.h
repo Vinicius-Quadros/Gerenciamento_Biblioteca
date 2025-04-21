@@ -4,15 +4,25 @@
 #include "livro.h"
 #include "emprestimo.h"
 
-// Funcoes de interface
+// Funções de Interface Geral
 void limparTela();
 void pausar();
 int continuarOperacao();
+
+// Cadastro e Exibição de Livros
 Livro* cadastrarLivro(Livro* lista);
 void exibirLivros(Livro* lista, Emprestimo* listaEmprestimos);
+
+// Operações de Empréstimo
 Emprestimo* menuEmprestimos(Livro* listaLivros, Emprestimo* listaEmprestimos);
+void registrarDevolucao(Livro* listaLivros, Emprestimo** listaEmprestimos);
+
+// Ordenação e Busca
 Livro* menuOrdenacao(Livro* lista);
 void menuBusca(Livro* lista);
 int exibirResultadoBusca(Livro* lista, char* criterioBusca, char* textoBusca);
-void registrarDevolucao(Livro* listaLivros, Emprestimo** listaEmprestimos);
+
+// Remoção de Livro
+void removerLivro(Livro** listaLivros, Emprestimo* listaEmprestimos);
+
 #endif

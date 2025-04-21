@@ -52,18 +52,31 @@ Livro* cadastrarLivro(Livro* lista) {
         // Obter dados do livro
         printf("\n=== Cadastro de Livro ===\n");
         printf("ID: %d (gerado automaticamente)\n", id);
+        printf("Digite 'sair' no titulo para voltar ao menu principal\n\n");
         
         printf("Titulo: ");
         getchar(); // Limpar o buffer do teclado
         fgets(titulo, sizeof(titulo), stdin);
         titulo[strcspn(titulo, "\n")] = '\0'; // Remover a quebra de linha
         
+        // Verificar se o usuário quer sair
+        if (strcmp(titulo, "sair") == 0) {
+            printf("\nVoltando ao menu principal...\n");
+            pausar();
+            return lista;
+        }
+        
         printf("Autor: ");
         fgets(autor, sizeof(autor), stdin);
         autor[strcspn(autor, "\n")] = '\0'; // Remover a quebra de linha
         
         printf("Ano: ");
-        scanf("%d", &ano);
+        if (scanf("%d", &ano) != 1) {
+            printf("\nValor invalido para ano! Cadastro cancelado.\n");
+            getchar(); // Limpar buffer
+            pausar();
+            continue;
+        }
         getchar(); // Limpar o buffer
         
         printf("Editora: ");
@@ -79,7 +92,12 @@ Livro* cadastrarLivro(Livro* lista) {
         isbn[strcspn(isbn, "\n")] = '\0';
         
         printf("Quantidade disponivel: ");
-        scanf("%d", &quantidade);
+        if (scanf("%d", &quantidade) != 1 || quantidade <= 0) {
+            printf("\nValor invalido para quantidade! Cadastro cancelado.\n");
+            getchar(); // Limpar buffer
+            pausar();
+            continue;
+        }
         
         // Criar e adicionar o livro
         Livro* novoLivro = criarLivro(id, titulo, autor, ano, editora, categoria, isbn, quantidade);
@@ -955,5 +973,119 @@ Emprestimo* menuEmprestimos(Livro* listaLivros, Emprestimo* listaEmprestimos) {
     return listaEmprestimos;
 }
 
-
+// Função para remover livros
+void removerLivro(Livro** listaLivros, Emprestimo* listaEmprestimos) {
+    limparTela();
+    
+    if (*listaLivros == NULL) {
+        printf("\nNenhum livro cadastrado para remover!\n");
+        pausar();
+        return;
+    }
+    
+    int idLivro;
+    printf("\n=== Remover Livro ===\n");
+    printf("Digite o ID do livro a ser removido: ");
+    scanf("%d", &idLivro);
+    
+    // Verificar se o livro existe
+    Livro* livro = NULL;
+    Livro* atual = obterPrimeiro(*listaLivros);
+    while (atual != NULL) {
+        if (atual->id == idLivro) {
+            livro = atual;
+            break;
+        }
+        atual = atual->prox;
+    }
+    
+    if (livro == NULL) {
+        printf("\nLivro com ID %d nao encontrado!\n", idLivro);
+        pausar();
+        return;
+    }
+    
+    // Exibir informações do livro
+    printf("\nInformacoes do Livro:\n");
+    printf("ID: %d\n", livro->id);
+    printf("Titulo: %s\n", livro->titulo);
+    printf("Autor: %s\n", livro->autor);
+    printf("Editora: %s\n", livro->editora);
+    printf("Quantidade: %d\n", livro->quantidade);
+    
+    // Verificar quantos exemplares estão emprestados
+    int emprestados = 0;
+    Emprestimo* empAtual = listaEmprestimos;
+    while (empAtual != NULL) {
+        if (empAtual->idLivro == idLivro) {
+            emprestados++;
+        }
+        empAtual = empAtual->prox;
+    }
+    
+    printf("Exemplares emprestados: %d\n", emprestados);
+    printf("Exemplares disponiveis para remocao: %d\n", livro->quantidade - emprestados);
+    
+    if (emprestados >= livro->quantidade) {
+        printf("\nNao e possivel remover este livro pois todos os exemplares estao emprestados!\n");
+        pausar();
+        return;
+    }
+    
+    int qtdRemover;
+    if (livro->quantidade == 1) {
+        printf("\nEste livro possui apenas 1 exemplar. Deseja remove-lo? (1-Sim/0-Nao): ");
+        scanf("%d", &qtdRemover);
+        if (qtdRemover == 1) {
+            qtdRemover = 1;
+        } else {
+            printf("\nOperacao cancelada!\n");
+            pausar();
+            return;
+        }
+    } else {
+        printf("\nQuantos exemplares deseja remover (1-%d): ", livro->quantidade - emprestados);
+        scanf("%d", &qtdRemover);
+        
+        if (qtdRemover <= 0 || qtdRemover > (livro->quantidade - emprestados)) {
+            printf("\nQuantidade invalida para remocao!\n");
+            pausar();
+            return;
+        }
+    }
+    
+    // Remover os exemplares
+    if (qtdRemover == livro->quantidade) {
+        // Remover o livro completamente da lista
+        if (livro == *listaLivros) {
+            // É o primeiro elemento
+            *listaLivros = livro->prox;
+            if (*listaLivros != NULL) {
+                (*listaLivros)->ant = NULL;
+            }
+        } else {
+            // Está no meio ou no final
+            if (livro->ant != NULL) {
+                livro->ant->prox = livro->prox;
+            }
+            if (livro->prox != NULL) {
+                livro->prox->ant = livro->ant;
+            }
+        }
+        
+        free(livro);
+        printf("\n%d exemplar(es) do livro removido(s) com sucesso!\n", qtdRemover);
+        printf("O livro foi completamente removido do sistema.\n");
+    } else {
+        // Reduzir a quantidade
+        livro->quantidade -= qtdRemover;
+        printf("\n%d exemplar(es) do livro removido(s) com sucesso!\n", qtdRemover);
+        printf("Nova quantidade: %d exemplar(es)\n", livro->quantidade);
+    }
+    
+    // Salvar as alterações
+    salvarLivros(*listaLivros);
+    
+    pausar();
+}
 

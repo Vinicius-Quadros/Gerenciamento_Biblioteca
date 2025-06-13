@@ -5,7 +5,7 @@ Um sistema completo de gerenciamento de biblioteca implementado em C, utilizando
 ## Autores
 
 - Vinicius Ribas Quadros
-- Giovanni Antonietto Rosa
+- Giovanni Rosa Antonietto
 - Lucas Antonio Ribeiro
 - Gustavo Fortunato
 
